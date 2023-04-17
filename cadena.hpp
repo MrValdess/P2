@@ -13,9 +13,6 @@ class Cadena{
         Cadena(const char* cad);   //Costructor a partir de cadena de bajo nivel
         Cadena (Cadena&& cad); //Constructor de movimiento
 
-        //Conversor a const char*
-        explicit operator const char*() const;
-
         //Operadores de asignacion
         Cadena& operator =(const Cadena& cad);   
         Cadena& operator =(Cadena&& cad);
@@ -23,6 +20,7 @@ class Cadena{
 
         //Observador
         size_t length() const noexcept;
+        const char* c_str() const noexcept;
 
         //Operadores de concatenacion   
         Cadena& operator +=(const Cadena& c);
@@ -82,8 +80,8 @@ bool operator >=(const Cadena& cad1, const Cadena& cad2);
         
 
 //Funciones inline observadoras
-inline size_t Cadena::length() const noexcept {return tam_;};
-inline Cadena::operator const char*() const {return s_;}
+inline size_t Cadena::length() const noexcept {return tam_;}
+inline const char* Cadena::c_str() const noexcept {return s_;}
 
 //Funcion de concatenacion
 Cadena& operator +(const Cadena& c1, const Cadena& c2);
@@ -151,7 +149,7 @@ namespace std { // Estaremos dentro del espacio de nombres std.
         size_t operator() (const Cadena& cad) const // El operador función.
         {
             hash<string> hs; // Creamos un objeto hash de string.
-            auto p{(const char*)(cad)}; // Convertimos Cadena a cadena de bajo nivel.
+            const char* p = cad.c_str(); // Convertimos Cadena a cadena de bajo nivel.
             string s{p}; // Creamos un string desde la cadena de b. nivel .
             size_t res{hs(s)}; // El hash del string . Como hs.operator()(s);
             return res; // Devolvemos el hash del string.

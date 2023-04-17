@@ -1,14 +1,13 @@
 //Pablo Garcia Bravo
 
+#ifndef _ARRTICULO_HPP_
+#define _ARTICULO_HPP_
+
 #include "fecha.hpp"
 #include "cadena.hpp"
 #include <iostream>
 #include <locale>
 #include <iomanip>
-
-#ifndef _ARRTICULO_HPP_
-#define _ARTICULO_HPP_
-
 
 
 class Articulo{
@@ -48,7 +47,7 @@ inline size_t Articulo::stock() const noexcept{return stock_;}
 inline double& Articulo::precio() noexcept{return precio_;}
 inline size_t& Articulo::stock() noexcept{return stock_;}
 
-//Operador de flujo
+//Operador de insercion de flujo
 std::ostream& operator<<(std::ostream& os, const Articulo& art) noexcept;
 
 

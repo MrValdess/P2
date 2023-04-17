@@ -92,7 +92,7 @@ Cadena& operator +(const Cadena& c1, const Cadena& c2){
 ///////////////OPERADORES LOGICOS/////////////////
 
 bool operator ==(const Cadena& cad1, const Cadena& cad2) {
-    if(strcmp((const char*) cad1, (const char*) cad2) == 0) return true;
+    if(strcmp(cad1.c_str(), cad2.c_str()) == 0) return true;
     else return false;
 };
 
@@ -102,7 +102,7 @@ bool operator !=(const Cadena& cad1, const Cadena& cad2) {
 };
 
 bool operator <(const Cadena& cad1, const Cadena& cad2) {
-    if (strcmp((const char*) cad1, (const char*) cad2) < 0) return true;
+    if (strcmp(cad1.c_str(), cad2.c_str()) < 0) return true;
     else return false;
 };
 
@@ -123,7 +123,7 @@ bool operator <=(const Cadena& cad1, const Cadena& cad2) {
 ////////////////////OPERADORES DE INSERCION Y EXTRACCION//////////////
 
 std::ostream& operator <<(std::ostream& os, const Cadena& cad) noexcept{
-    os << (const char*)cad;
+    os << cad.c_str();
     return os;
 }
 
