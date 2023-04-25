@@ -1,55 +1,42 @@
 //Pablo Garcia Bravo
 
-#ifndef _ARRTICULO_HPP_
+#ifndef _ARTICULO_HPP_
 #define _ARTICULO_HPP_
 
-#include "fecha.hpp"
-#include "cadena.hpp"
 #include <iostream>
-#include <locale>
 #include <iomanip>
+#include "../P1/cadena.hpp"
+#include "../P1/fecha.hpp"
 
+using namespace std;
 
 class Articulo{
-    public:
-        //Constructores
-        explicit Articulo(const Cadena& r, const Cadena& t, const Fecha& f, double p, size_t st = 0);
+public:
+    //Constructor
+    Articulo(Cadena r,Cadena t, Fecha f, double p, size_t st = 0);
+    
+    //Métodos observadores
+    Cadena referencia() const noexcept{ return referencia_;}
+    Cadena titulo() const noexcept {return titulo_;}
+    Fecha f_publi() const noexcept {return f_publi_;}
+    double precio() const noexcept {return precio_;};
+    double& precio(){return precio_;}
+    size_t stock() const noexcept {return stock_;}
+    size_t& stock (){return stock_;}
 
-        //Metodos observadores
-        const Cadena& referencia() const noexcept; 
-        const Cadena& titulo()const noexcept;
-        const Fecha& f_publi() const noexcept;
-        double precio() const noexcept;
-        double& precio() noexcept;
-        size_t stock() const noexcept;
-        size_t& stock() noexcept;
+    //Destructor por defecto
+    ~Articulo() = default;
 
-        //Destructor por defecto
-        ~Articulo() = default;
-
-    private:
-        //Variables de la clase
-        const Cadena referencia_;
-        const Cadena titulo_;
-        const Fecha f_publi_;
-        size_t stock_;
-        double precio_;
+private:
+    //Variables de la clase
+    const Cadena referencia_;
+    const Cadena titulo_;
+    const Fecha f_publi_;
+    size_t stock_;
+    double precio_;
 };
 
-//Metodos inline
-//Observadores
-inline const Cadena& Articulo::referencia() const noexcept{return referencia_;}
-inline const Cadena& Articulo::titulo() const noexcept{return titulo_;}
-inline const Fecha& Articulo::f_publi() const noexcept{return f_publi_;}
-inline double Articulo::precio() const noexcept{return precio_;}
-inline size_t Articulo::stock() const noexcept{return stock_;}
-//Observadoras devolviendo referencia
-inline double& Articulo::precio() noexcept{return precio_;}
-inline size_t& Articulo::stock() noexcept{return stock_;}
-
 //Operador de insercion de flujo
-std::ostream& operator<<(std::ostream& os, const Articulo& art) noexcept;
-
-
+ostream& operator <<(ostream&, const Articulo&);
 
 #endif // _ARTICULO_HPP_

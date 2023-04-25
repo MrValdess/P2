@@ -1,128 +1,133 @@
-//Pablo Garcia Bravo
+#ifndef _TARJETA_HPP
+#define _TARJETA_HPP
 
-#ifndef _TARJETA_HPP_
-#define _TARJETA_HPP_
 
+#include "../P1/cadena.hpp"
+#include "../P1/fecha.hpp"
+#include <set>
 #include <iostream>
-#include <set>      //Mapas de tarjetas
-#include <cctype>   //para isdigit
-#include <iomanip>  
+#include <locale>
 
-#include "fecha.hpp"
-#include "cadena.hpp"
-#include "usuario.hpp"
+using std::set;
+using std::endl;
 
-//Declaraciones anticipadas de las clases
 class Usuario;
 
-/*Declaramos primero la clase numero para que funcione la clase tarjeta*/
-
-////////////////CLASE NUMERO/////////////////
+/////////CLASE NUMERO//////////////
 class Numero{
     public:
         //Constructor
-        Numero(const Cadena& cad);
+        Numero(const Cadena& num);
 
-        //Operador de conversion
-        operator const char*() const noexcept;
+        //Operador de conversion a const char
+        operator const char*() const;
 
-        //Clase Incorrecta y Razon
+        //Clase Incorrecto y enum Razon
         enum Razon{LONGITUD, DIGITOS, NO_VALIDO};
-        
         class Incorrecto{
             public:
-                Incorrecto(Numero::Razon razon);
-                Numero::Razon razon() const noexcept{return razon_;};
+                Incorrecto(Razon razon): razon_(razon){}
+                Numero::Razon razon() const{return razon_;}
             private:
                 Numero::Razon razon_;
         };
+
     private:
-        //Variables
         Cadena numero_;
 };
-//Metodos inline//
-//Conversion a const char*
-inline Numero::operator const char *()const noexcept{return numero_.c_str();}
+
+//Operador de conversión 
+inline Numero::operator const char*() const{ 
+    return (const char*) numero_;
+}
+
 
 //Operador menor que
-inline bool operator <(const Numero& num1, const Numero& num2){return static_cast<Cadena>(num1) < static_cast<Cadena>(num2);};  //static cast para transformar de Numero a Cadena
-//Constructor de la clase Incorrecta
-inline Numero::Incorrecto::Incorrecto(Numero::Razon razon): razon_(razon){};
+inline bool operator < (const Numero& num1, const Numero& num2){
+    return strcmp(static_cast<const char*>(num1), static_cast<const char*>(num2)) < 0;
+}
 
-
-////////////////CLASE TARJETA/////////////////
+////////////CLASE TARJETA///////////////
 class Tarjeta{
     public:
-        //Constructores
-        Tarjeta(const Numero& num, Usuario* user, const Fecha& fech);
-        //Suprimimos el constructor de copia con delete, al igual que el operador de asignacion
-        Tarjeta(Tarjeta& tar) = delete;
-        Tarjeta& operator =(Tarjeta& tar) = delete;
+        //Constructor y eliminación de copia
+        Tarjeta(const Numero& num, Usuario& titular, const Fecha& cad); 
+        Tarjeta(const Tarjeta& ) = delete;
+        Tarjeta& operator =(const Tarjeta&) = delete;
 
-        //Enumeracion tipo
-        enum Tipo{Otro, VISA, Mastercard, Maestro, JBC, AmericanExpress};
+        //Enum de Tipo
+        enum Tipo {Otro, VISA, Mastercard, Maestro, JCB, AmericanExpress};
+        
+        //Métodos observadores
+        const Numero& numero() const;
+        Usuario* titular() const;
+        const Fecha& caducidad() const;
+        bool activa() const ;
+        bool activa(bool estado);
+        Tipo tipo() const noexcept;
 
-        //Clases de excepciones
+        //Hacemos friend al operador de insercion para acceder a la parte privada
+        friend std::ostream& operator <<(std::ostream& os, const Tarjeta& tar);
+        friend std::ostream& operator <<(std::ostream& os, const Tipo& tipo);
+
+        //Titular Facial
+        Cadena titular_facial() const;
+        
+        //Clase Caducada
         class Caducada{
             public:
-                Caducada(const Fecha& fech);
-                const Fecha& cuando() const noexcept{return caducada_;};
+                Caducada(Fecha fecha):fecha_(fecha){}
+                Fecha cuando() const {return fecha_;}
             private:
-                Fecha caducada_;
+                Fecha fecha_;
         };
 
+        //Clase Num_duplicado
         class Num_duplicado{
             public:
-                Num_duplicado(const Numero& num);
-                const Numero& que() const noexcept{return duplicado_;};
+                Num_duplicado(const Numero& duplicado):duplicado_(duplicado){}
+                Numero que() const {return duplicado_;}
             private:
                 Numero duplicado_;
         };
-        
-        //Metodos observadores
-        const Numero& numero() const noexcept {return numero_;};
-        Usuario* titular() const noexcept {return titular_;};
-        const Fecha& caducidad() const noexcept {return caducidad_;};
-        bool activa() const noexcept {return activa_;};
-        Tipo tipo() const noexcept;
-
-        //Metodo para activar/desactivar tarjeta(sobrecarga del metodo observador activa)
-        bool activa(bool b = true) noexcept;    //default = true
 
         //Destructor
         ~Tarjeta();
-
     private:
         //Variables
         const Numero numero_;
-        Usuario* const titular_;
+        Usuario* const titular_; //enlace con objeto usuario
         const Fecha caducidad_;
         bool activa_;
+        static set<Numero> tarjetas_;
 
-        //Todas las tarjetas existentes
-        static std::set<Numero> List_tarjetas;
+        //Anular Tarjeta
+        friend class Usuario;
+        void anular_titular();
 };
 
-//Operador logico
-bool operator <(const Tarjeta& ta, const Tarjeta& tb);
-inline bool operator <(const Tarjeta& ta, const Tarjeta& tb){
-    return (ta.numero() < tb.numero());
-}
-
-//Operador de insercion de flujo
-std::ostream& operator <<(std::ostream& os, Tarjeta::Tipo& t);
-std::ostream& operator <<(std::ostream& os, Tarjeta& tar) noexcept;
-
-//Metodos inline
-inline bool Tarjeta::activa(bool b) noexcept{
-    activa_ = b;
+//Métodos observadores
+inline const Numero& Tarjeta::numero() const{return numero_;}
+inline Usuario* Tarjeta::titular() const {return titular_;}
+inline const Fecha& Tarjeta::caducidad() const {return caducidad_;}
+inline bool Tarjeta::activa() const {return activa_;}
+//Sobrecarga
+inline bool Tarjeta::activa(bool estado){
+    activa_ = estado;
     return activa_;
 }
-//CONSTRUCTORES DE LAS SUBCLASES//
-//Constructor de Caducada
-inline Tarjeta::Caducada::Caducada(const Fecha& fech): caducada_(fech){};
+//Anular tarjeta
+inline void Tarjeta::anular_titular(){
+    activa(false);
+    const_cast<Usuario*&>(titular_)=nullptr;
+}
 
-//Constructor de Num_duplicado
-inline Tarjeta::Num_duplicado::Num_duplicado(const Numero& num): duplicado_(num){};
 
-#endif // _TARJETA_HPP_
+//Operador menor que
+bool operator <(const Tarjeta& tar1, const Tarjeta& tar2);
+
+inline bool operator <(const Tarjeta& tar1, const Tarjeta& tar2){
+    return tar1.numero() < tar2.numero();
+}
+
+#endif //_TARJETA_HPP_
